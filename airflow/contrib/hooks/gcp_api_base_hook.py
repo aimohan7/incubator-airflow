@@ -123,7 +123,37 @@ class GoogleCloudBaseHook(BaseHook, LoggingMixin):
         service hook connection.
         """
         credentials = self._get_credentials()
-        http = httplib2.Http()
+        # Check for Proxy parameters
+        if 'Proxy_type' in self.extras:
+               if self.extras["Proxy_type"] == "SOCKS4":
+                  proxy_type = httplib2.socks.PROXY_TYPE_SOCKS4
+               elif self.extras["Proxy_type"] == "SOCKS5":
+                  proxy_type = httplib2.socks.PROXY_TYPE_SOCKS5
+               elif self.extras["Proxy_type"] == "HTTP":
+                  proxy_type = httplib2.socks.PROXY_TYPE_HTTP
+               elif self.extras["Proxy_type"] == "HTTP_NO_TUNNEL":
+                  proxy_type = httplib2.socks.PROXY_TYPE_HTTP_NO_TUNNEL
+        else:
+               proxy_type = None
+        if 'Proxy_host' in self.extras:
+               proxy_host = self.extras["Proxy_host"]
+        else:
+               proxy_host = None
+        if 'Proxy_port' in self.extras:
+               proxy_port = int(self.extras["Proxy_port"])
+        else:
+               proxy_port = None
+        if 'Proxy_rdns' in self.extras:
+               proxy_rdns = self.extras["Proxy_rdns"]
+        else:
+               proxy_rdns = True
+        if 'Proxy_user' in self.extras and 'Proxy_pass' in self.extras:
+               proxy_user = self.extras["Proxy_user"]
+               proxy_pass = self.extras["Proxy_pass"]
+        else:
+               proxy_user = None
+               proxy_pass = None
+        http = httplib2.Http(proxy_info=httplib2.ProxyInfo(proxy_type,proxy_host,proxy_port,proxy_rdns,proxy_user,proxy_pass))
         return credentials.authorize(http)
 
     def _get_field(self, f, default=None):
