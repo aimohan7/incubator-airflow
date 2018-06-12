@@ -147,11 +147,13 @@ class GoogleCloudBaseHook(BaseHook, LoggingMixin):
                proxy_rdns = self.extras["Proxy_rdns"]
         else:
                proxy_rdns = True
-        if 'Proxy_user' in self.extras and 'Proxy_pass' in self.extras:
+        if 'Proxy_user' in self.extras:
                proxy_user = self.extras["Proxy_user"]
-               proxy_pass = self.extras["Proxy_pass"]
         else:
                proxy_user = None
+        if 'Proxy_pass' in self.extras:
+               proxy_pass = self.extras["Proxy_pass"]
+        else:
                proxy_pass = None
         http = httplib2.Http(proxy_info=httplib2.ProxyInfo(proxy_type,proxy_host,proxy_port,proxy_rdns,proxy_user,proxy_pass))
         return credentials.authorize(http)
