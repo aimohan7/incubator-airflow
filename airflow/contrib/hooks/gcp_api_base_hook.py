@@ -26,7 +26,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from airflow.exceptions import AirflowException
 from airflow.hooks.base_hook import BaseHook
 from airflow.utils.log.logging_mixin import LoggingMixin
-
+from airflow import configuration
 
 class GoogleCloudBaseHook(BaseHook, LoggingMixin):
     """
@@ -123,7 +123,22 @@ class GoogleCloudBaseHook(BaseHook, LoggingMixin):
         service hook connection.
         """
         credentials = self._get_credentials()
-        http = httplib2.Http()
+        proxy = self.get_proxyConfig()
+        if proxy is not None and configuration.conf.getboolean('core', 'use_proxy') is True:
+           proxy_type = proxy.get('proxy_type', None)
+           if proxy_type == "SOCKS4":
+             proxy_type = httplib2.socks.PROXY_TYPE_SOCKS4
+           elif proxy_type == "SOCKS5":
+             proxy_type = httplib2.socks.PROXY_TYPE_SOCKS5
+           elif proxy_type == "HTTP":
+             proxy_type = httplib2.socks.PROXY_TYPE_HTTP
+           elif proxy_type == "HTTP_NO_TUNNEL":
+             proxy_type = httplib2.socks.PROXY_TYPE_HTTP_NO_TUNNEL
+           proxy_host = proxy.get('proxy_host')
+           proxy_port = int(proxy.get('proxy_port'))
+           http = httplib2.Http(proxy_info=httplib2.ProxyInfo(proxy_type, proxy_host, proxy_port))
+        else:
+           http = httplib2.Http()
         return credentials.authorize(http)
 
     def _get_field(self, f, default=None):
