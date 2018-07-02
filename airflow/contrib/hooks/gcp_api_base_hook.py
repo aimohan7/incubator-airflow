@@ -124,16 +124,20 @@ class GoogleCloudBaseHook(BaseHook, LoggingMixin):
         """
         credentials = self._get_credentials()
         proxy = self.get_proxyConfig()
+
         if proxy is not None and configuration.conf.getboolean('core', 'use_proxy') is True:
            proxy_type = proxy.get('proxy_type', None)
            if proxy_type == "SOCKS4":
-             proxy_type = httplib2.socks.PROXY_TYPE_SOCKS4
+                proxy_type = httplib2.socks.PROXY_TYPE_SOCKS4
            elif proxy_type == "SOCKS5":
-             proxy_type = httplib2.socks.PROXY_TYPE_SOCKS5
+                proxy_type = httplib2.socks.PROXY_TYPE_SOCKS5
            elif proxy_type == "HTTP":
-             proxy_type = httplib2.socks.PROXY_TYPE_HTTP
+                proxy_type = httplib2.socks.PROXY_TYPE_HTTP
            elif proxy_type == "HTTP_NO_TUNNEL":
-             proxy_type = httplib2.socks.PROXY_TYPE_HTTP_NO_TUNNEL
+                proxy_type = httplib2.socks.PROXY_TYPE_HTTP_NO_TUNNEL
+           else:
+                proxy_type = None
+
            proxy_host = proxy.get('proxy_host')
            proxy_port = int(proxy.get('proxy_port'))
            http = httplib2.Http(proxy_info=httplib2.ProxyInfo(proxy_type, proxy_host, proxy_port))

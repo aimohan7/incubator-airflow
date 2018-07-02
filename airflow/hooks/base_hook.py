@@ -90,7 +90,7 @@ class BaseHook(LoggingMixin):
         return connection.get_hook()
 
     def get_proxyConfig(self):
-        proxy_config = configuration.conf.getsection('proxy')
+        proxy_config = configuration.as_dict(display_sensitive=True)['proxy']
         return proxy_config
 
     def get_conn(self):
