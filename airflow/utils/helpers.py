@@ -7,9 +7,9 @@
 # to you under the Apache License, Version 2.0 (the
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
-# 
+#
 #   http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -40,7 +40,9 @@ from jinja2 import Template
 
 from airflow import configuration
 from airflow.exceptions import AirflowException
+from airflow.utils.log.logging_mixin import LoggingMixin
 
+log = LoggingMixin().log
 # When killing processes, time to wait after issuing a SIGTERM before issuing a
 # SIGKILL.
 DEFAULT_TIME_TO_WAIT_AFTER_SIGTERM = configuration.conf.getint(
@@ -259,6 +261,18 @@ def parse_template_string(template_string):
         return None, Template(template_string)
     else:
         return template_string, None
+
+
+def convert_to_int(non_int_value, default_value=None):
+    int_value = None
+    try:
+        if non_int_value:
+            int_value = int(non_int_value)
+    except ValueError as err:
+        log.warning(err)
+    if int_value is None and default_value:
+        int_value = default_value
+    return int_value
 
 
 class AirflowImporter(object):
