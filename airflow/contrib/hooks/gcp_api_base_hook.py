@@ -26,7 +26,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 from airflow.exceptions import AirflowException
 from airflow.hooks.base_hook import BaseHook
 from airflow.utils.log.logging_mixin import LoggingMixin
-from airflow import configuration
+from airflow.configuration import conf
+from airflow.exceptions import AirflowConfigException
 from airflow.utils.helpers import convert_to_int
 
 class GoogleCloudBaseHook(BaseHook, LoggingMixin):
@@ -124,7 +125,7 @@ class GoogleCloudBaseHook(BaseHook, LoggingMixin):
         service hook connection.
         """
         credentials = self._get_credentials()
-        if configuration.conf.getboolean('core', 'use_proxy') is True:
+        if self.get_useproxy() is True:
             proxy = self.get_proxyconfig()
             proxy_type_from_config = proxy.get('proxy_type', None)
             if proxy_type_from_config in GoogleCloudBaseHook.proxy_type_dictionary:
@@ -150,6 +151,16 @@ class GoogleCloudBaseHook(BaseHook, LoggingMixin):
             return self.extras[long_f]
         else:
             return default
+
+    def get_useproxy(self):
+        """
+        Fetch use_proxy field from config file
+        """
+        try:
+            use_proxy = conf.getboolean('core', 'use_proxy')
+        except AirflowConfigException:
+            use_proxy = False
+        return use_proxy
 
     @property
     def project_id(self):
