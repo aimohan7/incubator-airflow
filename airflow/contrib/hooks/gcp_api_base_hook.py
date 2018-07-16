@@ -50,6 +50,12 @@ class GoogleCloudBaseHook(BaseHook, LoggingMixin):
 
     Legacy P12 key files are not supported.
     """
+    proxy_type_dictionary = {
+        "SOCKS4": httplib2.socks.PROXY_TYPE_SOCKS4,
+        "SOCKS5": httplib2.socks.PROXY_TYPE_SOCKS5,
+        "HTTP": httplib2.socks.PROXY_TYPE_HTTP,
+        "HTTP_NO_TUNNEL": httplib2.socks.PROXY_TYPE_HTTP_NO_TUNNEL
+    }
 
     def __init__(self, gcp_conn_id='google_cloud_default', delegate_to=None):
         """
