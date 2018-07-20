@@ -953,6 +953,9 @@ def worker(args):
     env = os.environ.copy()
     env['AIRFLOW_HOME'] = settings.AIRFLOW_HOME
 
+    if not settings.validate_session():
+        sys.exit(0)
+
     # Celery worker
     from airflow.executors.celery_executor import app as celery_app
     from celery.bin import worker
