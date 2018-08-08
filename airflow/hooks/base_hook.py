@@ -99,8 +99,8 @@ class BaseHook(LoggingMixin):
             else:
                 log.error("Proxy section not found in config")
         except Exception as err:
-            log.error("Got Exception while fetching proxy details so returning Proxy details as None")
             log.error(err)
+	    log.error("Got Exception! returning Proxy details as None")
         return proxy_config
 
     def get_conn(self):
